@@ -276,7 +276,7 @@ function restartGame() {
 const bgMusic = document.createElement('audio');
 bgMusic.src = 'game.mp3';
 bgMusic.loop = true;
-bgMusic.volume = 0.3;
+bgMusic.volume = 0.5;
 
 function playMusic() {
   bgMusic.play().catch(() => {});
@@ -288,3 +288,4 @@ window.addEventListener('keydown', playMusic);
 </script>
 </body>
 </html>
+
