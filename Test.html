@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Space Flappy - Gravity Flip</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+  }
+  canvas {
+    display: block;
+    background: black;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<script>
+// === SETUP CANVAS ===
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+// === GAME VARIABLES ===
+const birdImg = new Image();
+birdImg.src = "pixel_bird-removebg-preview.png";
+
+const birdWidth = 90;
+const birdHeight = 90;
+
+let bird = {
+  x: canvas.width / 4,
+  y: canvas.height / 2,
+  vy: 0
+};
+
+// Gravity mechanics
+let gravity = 0.25;          // lighter gravity = easier
+let gravityDirection = 1;    // 1 = down, -1 = up
+const flapPower = 11;
+
+// Pipes
+let pipes = [];
+const pipeWidth = 50;        // thinner pipes
+const gapHeight = 400;       // bigger gap = easier
+const pipeSpeed = 3;         // slower pipes
+const pipeFrequency = 2200;  // new pipe every 2.2 sec
+
+let gameOver = false;
+
+// Background
+let bg = new Image();
+bg.src = "space.jpg";
+
+// Stars for space effect
+let stars = Array.from({ length: 50 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  radius: Math.random() * 2
+}));
+
+// Warning Animation Variables
+let warningActive = false;
+let warningStartTime = 0;
+const warningDuration = 1500; // warning lasts 1.5 seconds
+
+// === GRAVITY FLIP TIMER ===
+setInterval(() => {
+  warningActive = true;
+  warningStartTime = performance.now();
+
+  setTimeout(() => {
+    gravityDirection *= -1;
+    gravity = 0.25 * gravityDirection;
+    warningActive = false;
+  }, 1000);
+}, 6000);
+
+// === CONTROLS ===
+window.addEventListener("keydown", (e) => {
+  if (!gameOver) {
+    if (gravityDirection === 1 && e.code === "ArrowUp") {
+      bird.vy = -flapPower;
+    } else if (gravityDirection === -1 && e.code === "ArrowDown") {
+      bird.vy = flapPower;
+    }
+  }
+  if (e.code === "Space" && gameOver) {
+    restartGame();
+  }
+});
+
+// === PIPE GENERATION ===
+function addPipe() {
+  let topHeight = Math.random() * (canvas.height - gapHeight - 150) + 50;
+  pipes.push({
+    x: canvas.width,
+    topHeight: topHeight
+  });
+}
+setInterval(() => {
+  if (!gameOver) addPipe();
+}, pipeFrequency);
+
+// === UPDATE LOGIC ===
+function update() {
+  if (gameOver) return;
+
+  // Bird physics
+  bird.vy += gravity;
+  bird.y += bird.vy;
+
+  // Floor & ceiling with tolerance
+  if (bird.y - birdHeight / 2 < -10 || bird.y + birdHeight / 2 > canvas.height + 10) {
+    endGame();
+  }
+
+  // Pipes move + collision (smaller hitbox for forgiving gameplay)
+  for (let i = pipes.length - 1; i >= 0; i--) {
+    pipes[i].x -= pipeSpeed;
+
+    const birdLeft = bird.x - birdWidth / 3;
+    const birdRight = bird.x + birdWidth / 3;
+    const birdTop = bird.y - birdHeight / 3;
+    const birdBottom = bird.y + birdHeight / 3;
+
+    if (birdRight > pipes[i].x && birdLeft < pipes[i].x + pipeWidth) {
+      if (birdTop < pipes[i].topHeight || birdBottom > pipes[i].topHeight + gapHeight) {
+        endGame();
+      }
+    }
+
+    if (pipes[i].x + pipeWidth < 0) {
+      pipes.splice(i, 1);
+    }
+  }
+
+  // Move stars for background sparkle effect
+  stars.forEach(star => {
+    star.x -= 0.5;
+    if (star.x < 0) {
+      star.x = canvas.width;
+      star.y = Math.random() * canvas.height;
+    }
+  });
+}
+
+// === DRAW EVERYTHING ===
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+  // Stars
+  ctx.fillStyle = "white";
+  stars.forEach(star => {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Pipes with metallic gradient & cyan glow
+  for (let p of pipes) {
+    let grad = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
+    grad.addColorStop(0, "#555");
+    grad.addColorStop(0.5, "#aaa");
+    grad.addColorStop(1, "#555");
+
+    ctx.fillStyle = grad;
+    ctx.shadowColor = "cyan";
+    ctx.shadowBlur = 15;
+
+    ctx.fillRect(p.x, 0, pipeWidth, p.topHeight);
+    ctx.fillRect(p.x, p.topHeight + gapHeight, pipeWidth, canvas.height - (p.topHeight + gapHeight));
+
+    ctx.shadowBlur = 0;
+  }
+
+  // Bird
+  ctx.drawImage(birdImg, bird.x - birdWidth / 2, bird.y - birdHeight / 2, birdWidth, birdHeight);
+
+  // Warning Animation (retro bird pop)
+  if (warningActive) {
+    const elapsed = performance.now() - warningStartTime;
+    const scale = 1 + 0.5 * Math.sin((elapsed / warningDuration) * Math.PI * 4);
+    const alpha = 0.7 + 0.3 * Math.sin((elapsed / warningDuration) * Math.PI * 4);
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(canvas.width / 2, canvas.height / 4);
+    ctx.scale(scale, scale);
+    ctx.drawImage(birdImg, -birdWidth, -birdHeight, birdWidth * 2, birdHeight * 2);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = "yellow";
+    ctx.font = "bold 48px monospace";
+    ctx.textAlign = "center";
+    ctx.shadowColor = "yellow";
+    ctx.shadowBlur = 20;
+    ctx.fillText("GRAVITY FLIP INCOMING!", canvas.width / 2, canvas.height / 4 + birdHeight * 1.5);
+    ctx.restore();
+  }
+
+  // Game Over text
+  if (gameOver) {
+    ctx.fillStyle = "white";
+    ctx.font = "48px monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("GAME OVER - Press SPACE to Restart", canvas.width / 2, canvas.height / 2);
+  }
+}
+
+// === GAME LOOP ===
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
+
+// === GAME OVER & RESTART ===
+function endGame() {
+  gameOver = true;
+}
+
+function restartGame() {
+  bird.y = canvas.height / 2;
+  bird.vy = 0;
+  pipes = [];
+  gameOver = false;
+  gravityDirection = 1;
+  gravity = 0.25;
+}
+</script>
+</body>
+</html>

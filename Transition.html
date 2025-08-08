@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pacelayers - The Layers of the Web</title>
+<style>
+  body {
+    font-family: sans-serif;
+    font-size: calc(0.5em + 1vmin);
+    color: #eee;
+    background-color: #111;
+    width: 90%;
+    max-width: 35em;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2em;
+  }
+  ol.paces {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    position: relative;
+    padding-top: 100%;
+  }
+  li.pace {
+    font-size: 90%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0.5em;
+    text-align: center;
+    border: 1px solid #fff;
+    border-radius: 60%;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: all ease-in-out 0.2s;
+  }
+  li.pace .quote {
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+  }
+  li.pace:hover,
+  li.pace:focus,
+  li.pace:active {
+    cursor: grabbing;
+    background-color: #111;
+    color: #111;
+    animation: none !important;
+  }
+  li.pace:hover .quote,
+  li.pace:focus .quote,
+  li.pace:active .quote {
+    color: #fff;
+    hyphens: auto;
+    z-index: 100;
+    opacity: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  li.pace.js {
+    margin: 5%;
+    animation: rotate 2.5s infinite linear;
+    box-shadow: 0 0 5em #fff;
+  }
+  li.pace.css {
+    margin: 10%;
+    animation: rotate 5s infinite linear;
+  }
+  li.pace.html {
+    margin: 15%;
+    animation: rotate 10s infinite linear;
+  }
+  li.pace.url {
+    margin: 20%;
+    animation: rotate 15s infinite linear;
+  }
+  li.pace.http {
+    margin: 25%;
+    animation: rotate 25s infinite linear;
+  }
+  li.pace.tcpip {
+    margin: 30%;
+    animation: rotate 35s infinite linear;
+  }
+
+  .quote.js {
+    padding: 10%;
+  }
+  .quote.css {
+    padding: 5%;
+  }
+  .quote.html {
+    padding: 4%;
+  }
+
+  footer {
+    text-align: center;
+    background-color: #111;
+    transform: translateY(-80%);
+    padding-top: 2em;
+    padding-bottom: 2.5em;
+    padding-left: 2em;
+    padding-right: 2em;
+    margin-left: -2em;
+    margin-right: -2em;
+    box-shadow: 0 -1em 1em #111;
+  }
+  footer a {
+    color: #666;
+    text-decoration: none;
+  }
+  footer a:hover,
+  footer a:focus,
+  footer a:active {
+    color: #fff;
+  }
+
+  .quotes .quote {
+    opacity: 0;
+  }
+  .quotes .quote:target {
+    position: absolute;
+    top: 0;
+    opacity: 1;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+</head>
+<body>
+  <ol reversed class="paces" lang="en">
+    <li class="pace js">
+      JS+
+      <blockquote class="quote js">
+        JS+: The JavaScript ecosystem (not the language!): Anyone else feels overwhelmed by the rate of rapid changes here?
+      </blockquote>
+    </li>
+    <li class="pace css">
+      CSS
+      <blockquote class="quote css">
+        CSS: This is moving in a nice click lately, with lots of useful new stuff enabled in the browsers
+      </blockquote>
+    </li>
+    <li class="pace html">
+      HTML
+      <blockquote class="quote html">
+        HTML: Started with 20 something "tags", now we have over 100 "elements", but I feel that I've been able to keep up with the pace of change here
+      </blockquote>
+    </li>
+    <li class="pace url">
+      URLs
+      <blockquote class="quote url">
+        URLs: Sadly they are frequently changing; links die. We should work hard to keep URLs unchanged, but that's not how it is
+      </blockquote>
+    </li>
+    <li class="pace http">
+      HTTP
+      <blockquote class="quote http">
+        HTTP: Gradually changed (http/2), but it kind of feels good that it doesn't constantly change underneath us
+      </blockquote>
+    </li>
+    <li class="pace tcpip">
+      TCP/IP
+      <blockquote class="quote tcpip">
+        TCP/IP: Deliberately dumb, simple, all it does is move packets around
+      </blockquote>
+    </li>  
+  </ol>
+
+  <footer>
+    <blockquote>
+      <p>Fast gets all the attention,<br>
+      but Slow has all the power</p>
+      <cite>Stewart Brand "Pacelayers"</cite>
+    </blockquote>
+    <a href="https://vimeo.com/373128517">The Layers of the Web - Jeremy Keith</a>
+  </footer>
+
+  <script>
+    setTimeout(() => {
+      window.location.href = 'GravitySwap.html';
+    }, 2250);
+  </script>
+</body>
+</html>
