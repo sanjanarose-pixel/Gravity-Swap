@@ -1,211 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Flappy Bird with Gravity Switch</title>
-<style>
-  body, html {
-    margin: 0; padding: 0; background: #def; font-family: Arial, sans-serif;
-    user-select: none;
-  }
-  canvas {
-    display: block;
-    margin: 20px auto;
-    background: #fff;
-    border: 3px solid #222;
-  }
-  #score {
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    color: #222;
-  }
-  #message {
-    text-align: center;
-    font-size: 32px;
-    color: red;
-    display: none;
-    margin-top: 10px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space Flappy - Gravity Flip</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-
-<div id="score">Score: 0</div>
-<canvas id="game" width="400" height="600"></canvas>
-<div id="message">Game Over! Press Space to Restart</div>
+<canvas id="game"></canvas>
 
 <script>
-(() => {
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
-  const scoreEl = document.getElementById('score');
-  const messageEl = document.getElementById('message');
+// =============================
+// 1. SETUP CANVAS
+// =============================
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-  const WIDTH = canvas.width;
-  const HEIGHT = canvas.height;
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-  const birdRadius = 15;
-  const pipeWidth = 60;
-  const pipeGap = 150;
+// =============================
+// 2. GAME VARIABLES
+// =============================
+const birdImg = new Image();
+birdImg.src = "pixel_bird-removebg-preview.png";
 
-  let bird = { x: WIDTH / 4, y: HEIGHT / 2, vy: 0 };
-  let gravity = 0.6;
-  const flapPower = 10;
+const birdWidth = 90;
+const birdHeight = 90;
 
-  let pipes = [];
-  const pipeSpawnInterval = 1600; // ms
-  let lastPipeTime = 0;
+let bird = {
+  x: canvas.width / 4,
+  y: canvas.height / 2,
+  vy: 0
+};
 
-  let score = 0;
-  let gameOver = false;
+// Gravity mechanics
+let gravity = 0.25;           // slightly lighter gravity for easier play
+let gravityDirection = 1;    // 1 = down, -1 = up
+const flapPower = 11;        // stronger flap power
 
-  const gravityFlipInterval = 5000; // 5 seconds
-  let lastGravityFlip = Date.now();
+// Pipes
+let pipes = [];
+const pipeWidth = 60;        // thinner pipes
+const gapHeight = 400;       // bigger gap = easier
+const pipeSpeed = 3.2;       // slightly slower pipes
+const pipeFrequency = 2000;  // ms
 
-  // Listen for controls
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'ArrowUp' && !gameOver) {
-      // Flap opposite to gravity
-      bird.vy = -Math.sign(gravity) * flapPower;
-      e.preventDefault();
+let gameOver = false;
+
+// Background
+let bg = new Image();
+bg.src = "space.jpg";
+
+// Gravity flip timing
+let warningMessage = "";
+const gravityFlipInterval = 6000; // every 6 seconds
+
+// Sparkle stars for space effect
+let stars = Array.from({ length: 50 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  radius: Math.random() * 2
+}));
+
+// Start gravity flip timer
+setInterval(() => {
+  // 1 second before flip, show warning
+  warningMessage = "⚠ Gravity Flip Incoming! ⚠";
+  setTimeout(() => {
+    // Flip gravity
+    gravityDirection *= -1;
+    gravity = 0.4 * gravityDirection;
+    warningMessage = "";
+  }, 1000);
+}, gravityFlipInterval);
+
+// =============================
+// 3. CONTROLS
+// =============================
+window.addEventListener("keydown", (e) => {
+  if (!gameOver) {
+    if (gravityDirection === 1 && e.code === "ArrowUp") {
+      bird.vy = -flapPower;
+    } else if (gravityDirection === -1 && e.code === "ArrowDown") {
+      bird.vy = flapPower;
     }
-    if (e.code === 'Space' && gameOver) {
-      restart();
-      e.preventDefault();
+  }
+  if (e.code === "Space" && gameOver) {
+    restartGame();
+  }
+});
+
+// =============================
+// 4. PIPE GENERATION
+// =============================
+function addPipe() {
+  let topHeight = Math.random() * (canvas.height - gapHeight - 150) + 50;
+  pipes.push({
+    x: canvas.width,
+    topHeight: topHeight
+  });
+}
+setInterval(() => {
+  if (!gameOver) addPipe();
+}, pipeFrequency);
+
+// =============================
+// 5. UPDATE LOGIC
+// =============================
+function update() {
+  if (gameOver) return;
+
+  // Bird physics
+  bird.vy += gravity;
+  bird.y += bird.vy;
+
+  // Check collision with floor/ceiling
+  if (bird.y - birdHeight / 2 < 0 || bird.y + birdHeight / 2 > canvas.height) {
+    endGame();
+  }
+
+  // Pipes movement + collision
+  for (let i = pipes.length - 1; i >= 0; i--) {
+    pipes[i].x -= pipeSpeed;
+
+    if (
+      bird.x + birdWidth / 2 > pipes[i].x &&
+      bird.x - birdWidth / 2 < pipes[i].x + pipeWidth
+    ) {
+      if (
+        bird.y - birdHeight / 2 < pipes[i].topHeight ||
+        bird.y + birdHeight / 2 > pipes[i].topHeight + gapHeight
+      ) {
+        endGame();
+      }
+    }
+
+    if (pipes[i].x + pipeWidth < 0) {
+      pipes.splice(i, 1);
+    }
+  }
+
+  // Move stars for space effect
+  stars.forEach(star => {
+    star.x -= 0.5;
+    if (star.x < 0) {
+      star.x = canvas.width;
+      star.y = Math.random() * canvas.height;
     }
   });
+}
 
-  function spawnPipe() {
-    const minGapY = pipeGap / 2 + 40;
-    const maxGapY = HEIGHT - pipeGap / 2 - 40;
-    const gapY = Math.random() * (maxGapY - minGapY) + minGapY;
-    pipes.push({ x: WIDTH, gapY });
-  }
+// =============================
+// 6. DRAW EVERYTHING
+// =============================
+function draw() {
+  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-  function update() {
-    if (gameOver) return;
-
-    // Flip gravity every 5 seconds
-    if (Date.now() - lastGravityFlip > gravityFlipInterval) {
-      gravity = -gravity;
-      lastGravityFlip = Date.now();
-    }
-
-    // Apply gravity to velocity and update position
-    bird.vy += gravity;
-    bird.y += bird.vy;
-
-    // Check edges and set game over if bird hits ground/ceiling (depending on gravity)
-    if (gravity > 0) {
-      if (bird.y + birdRadius > HEIGHT) {
-        bird.y = HEIGHT - birdRadius;
-        gameOver = true;
-      }
-      if (bird.y - birdRadius < 0) {
-        bird.y = birdRadius;
-        bird.vy = 0;
-      }
-    } else {
-      if (bird.y - birdRadius < 0) {
-        bird.y = birdRadius;
-        gameOver = true;
-      }
-      if (bird.y + birdRadius > HEIGHT) {
-        bird.y = HEIGHT - birdRadius;
-        bird.vy = 0;
-      }
-    }
-
-    // Spawn pipes regularly
-    if (Date.now() - lastPipeTime > pipeSpawnInterval) {
-      spawnPipe();
-      lastPipeTime = Date.now();
-    }
-
-    // Move pipes left
-    pipes.forEach(pipe => pipe.x -= 4);
-
-    // Remove pipes off screen & increase score
-    if (pipes.length > 0 && pipes[0].x + pipeWidth < 0) {
-      pipes.shift();
-      score++;
-      scoreEl.textContent = 'Score: ' + score;
-    }
-
-    // Collision detection
-    for (const pipe of pipes) {
-      const inXRange = bird.x + birdRadius > pipe.x && bird.x - birdRadius < pipe.x + pipeWidth;
-      if (inXRange) {
-        if (gravity > 0) {
-          if (bird.y - birdRadius < pipe.gapY - pipeGap / 2 || bird.y + birdRadius > pipe.gapY + pipeGap / 2) {
-            gameOver = true;
-            break;
-          }
-        } else {
-          if (bird.y + birdRadius > pipe.gapY + pipeGap / 2 || bird.y - birdRadius < pipe.gapY - pipeGap / 2) {
-            gameOver = true;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
-    // Draw pipes: green with black border
-    ctx.fillStyle = 'green';
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 3;
-    pipes.forEach(pipe => {
-      // Draw upper pipe
-      ctx.fillRect(pipe.x, 0, pipeWidth, pipe.gapY - pipeGap / 2);
-      ctx.strokeRect(pipe.x, 0, pipeWidth, pipe.gapY - pipeGap / 2);
-      // Draw lower pipe
-      ctx.fillRect(pipe.x, pipe.gapY + pipeGap / 2, pipeWidth, HEIGHT - (pipe.gapY + pipeGap / 2));
-      ctx.strokeRect(pipe.x, pipe.gapY + pipeGap / 2, pipeWidth, HEIGHT - (pipe.gapY + pipeGap / 2));
-    });
-
-    // Draw bird: red circle with black border
-    ctx.fillStyle = 'red';
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 3;
+  // Stars
+  ctx.fillStyle = "white";
+  stars.forEach(star => {
     ctx.beginPath();
-    ctx.arc(bird.x, bird.y, birdRadius, 0, Math.PI * 2);
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.stroke();
+  });
+
+  // Bird
+  ctx.drawImage(birdImg, bird.x - birdWidth / 2, bird.y - birdHeight / 2, birdWidth, birdHeight);
+
+  // Pipes with metallic gradient
+  for (let p of pipes) {
+    let grad = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
+    grad.addColorStop(0, "#555");
+    grad.addColorStop(0.5, "#aaa");
+    grad.addColorStop(1, "#555");
+
+    ctx.fillStyle = grad;
+    ctx.shadowColor = "cyan";
+    ctx.shadowBlur = 15;
+
+    ctx.fillRect(p.x, 0, pipeWidth, p.topHeight);
+    ctx.fillRect(p.x, p.topHeight + gapHeight, pipeWidth, canvas.height - (p.topHeight + gapHeight));
+
+    ctx.shadowBlur = 0; // reset shadow
   }
 
-  function gameLoop() {
-    update();
-    draw();
-    if (gameOver) {
-      messageEl.style.display = 'block';
-    } else {
-      messageEl.style.display = 'none';
-      requestAnimationFrame(gameLoop);
-    }
+  // Warning text
+  if (warningMessage) {
+    ctx.fillStyle = "yellow";
+    ctx.font = "48px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(warningMessage, canvas.width / 2, 100);
   }
 
-  function restart() {
-    bird = { x: WIDTH / 4, y: HEIGHT / 2, vy: 0 };
-    gravity = 0.6;
-    pipes = [];
-    score = 0;
-    scoreEl.textContent = 'Score: 0';
-    gameOver = false;
-    lastGravityFlip = Date.now();
-    lastPipeTime = Date.now();
-    messageEl.style.display = 'none';
-    requestAnimationFrame(gameLoop);
+  // Game Over text
+  if (gameOver) {
+    ctx.fillStyle = "white";
+    ctx.font = "48px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("GAME OVER - Press SPACE to Restart", canvas.width / 2, canvas.height / 2);
   }
+}
 
-  restart();
-})();
+// =============================
+// 7. GAME LOOP
+// =============================
+function gameLoop() {
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+gameLoop();
+
+// =============================
+// 8. GAME OVER & RESTART
+// =============================
+function endGame() {
+  gameOver = true;
+}
+function restartGame() {
+  bird.y = canvas.height / 2;
+  bird.vy = 0;
+  pipes = [];
+  gameOver = false;
+  gravityDirection = 1;
+ 
+  gravity = 0.4;
+}
 </script>
-
 </body>
 </html>
+
