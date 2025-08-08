@@ -29,18 +29,26 @@ This unpredictability increases difficulty and adds a unique twist for both casu
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+- Languages used- 1.HTML5-Structuring the web pages (`<video>`, `<canvas>`, `<audio>`, buttons, images, etc.)
+                  2.CSS-Styling animations, layout, buttons, fonts, background effects                    
+                  3.JavaScript-Main logic for animations, interactivity, canvas drawing, gravity flip mechanics  
+- Frameworks used-There are no JavaScript frameworks used in this project. The project is built using pure JavaScript.
+- Libraries used-1.Google Fonts(Orbitron, PressStart2P)-Custom sci-fi and retro game fonts
+                 2.Web APIs (built-in)	
+- Tools used-1.HTML5-Used for drawing and animating the flappy bird–style game                               
+             2.CSS Keyframes-Used to animate logo scaling, stars, button pulses, etc.                                
+
 
 ### Implementation
 For Software:
 # Installation
-[commands]
+This is a browser-based game implemented using HTML, CSS, and JavaScript. No installation of frameworks or compilers is required. All code runs natively in the browser.
 
 # Run
-[commands]
+Run via local file-
+Download the full project folder.
+Open index.html in your browser.
+Click "TAP TO START" to begin.
 
 ### Project Documentation
 For Software:
