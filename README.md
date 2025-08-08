@@ -1,26 +1,30 @@
 <img width="3188" height="1202" alt="frame (3)" src="https://github.com/user-attachments/assets/517ad8e9-ad22-457d-9538-a9e62d137cd7" />
 
 
-# [Project Name] 🎯
+# [Gravity Swap] 🎯
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: [Pixel Perfect]
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: [Sanjana Sujith] - [Muthoot Institute of Technology and Science]
+- Member 2: [Shaen Meryl Saj] - [Muthoot Institute of Technology and Science]
 
 ### Project Description
-[2-3 lines about what your project does]
+[A twist on the classic Flappy Bird game where gravity changes every 6 seconds.
+Players start by preventing the bird from falling, then must suddenly adapt to stop it from flying upwards.
+This constant reversal forces quick reflexes and adaptability, making it far more chaotic and fun.]
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+[The original Flappy Bird is simple and predictable, making it easy for players to get used to its mechanics.
+We wanted to introduce an extra challenge that disrupts rhythm and keeps players on edge.]
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+[We created a gameplay mechanic where gravity reverses periodically, forcing players to continuously relearn movement patterns.
+This unpredictability increases difficulty and adds a unique twist for both casual and competitive play.
+]
 
 ## Technical Details
 ### Technologies/Components Used
@@ -29,11 +33,6 @@ For Software:
 - [Frameworks used]
 - [Libraries used]
 - [Tools used]
-
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
 
 ### Implementation
 For Software:
