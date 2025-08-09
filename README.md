@@ -13,7 +13,7 @@
 - Member 2: Shaen Meryl Saj - Muthoot Institute of Technology and Science
 
 ### Project Description
-A twist on the classic Flappy Bird game where gravity changes every 6 seconds.
+A twist on the classic Flappy Bird game where gravity changes every 5 seconds.
 Players start by preventing the bird from falling, then must suddenly adapt to stop it from flying upwards.
 This constant reversal forces quick reflexes and adaptability, making it far more chaotic and fun.
 
