@@ -29,14 +29,17 @@ This unpredictability increases difficulty and adds a unique twist for both casu
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- Languages used- 1.HTML5-Structuring the web pages (`<video>`, `<canvas>`, `<audio>`, buttons, images, etc.)
-                  2.CSS-Styling animations, layout, buttons, fonts, background effects                    
-                  3.JavaScript-Main logic for animations, interactivity, canvas drawing, gravity flip mechanics  
+- Languages used-
+   1.HTML5-Structuring the web pages (`<video>`, `<canvas>`, `<audio>`, buttons, images, etc.)
+   2.CSS-Styling animations, layout, buttons, fonts, background effects                    
+   3.JavaScript-Main logic for animations, interactivity, canvas drawing, gravity flip mechanics  
 - Frameworks used-There are no JavaScript frameworks used in this project. The project is built using pure JavaScript.
-- Libraries used-1.Google Fonts(Orbitron, PressStart2P)-Custom sci-fi and retro game fonts
-                 2.Web APIs (built-in)	
-- Tools used-1.HTML5-Used for drawing and animating the flappy bird–style game                               
-             2.CSS Keyframes-Used to animate logo scaling, stars, button pulses, etc.                                
+- Libraries used-
+    1.Google Fonts(Orbitron, PressStart2P)-Custom sci-fi and retro game fonts
+    2.Web APIs (built-in)	
+- Tools used-
+    1.HTML5-Used for drawing and animating the flappy bird–style game                               
+    2.CSS Keyframes-Used to animate logo scaling, stars, button pulses, etc.                                
 
 
 ### Implementation
@@ -54,13 +57,16 @@ Click "TAP TO START" to begin.
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
+<img width="3188" height="1202" alt="frame (3)" src="Intropage.png" />
 *Add caption explaining what this shows*
 
-![Screenshot2](Add screenshot 2 here with proper name)
+<img width="3188" height="1202" alt="frame (3)" src="Loadingpage.png" />
 *Add caption explaining what this shows*
 
-![Screenshot3](Add screenshot 3 here with proper name)
+<img width="3188" height="1202" alt="frame (3)" src="Gameplay.png" />
+*Add caption explaining what this shows*
+
+<img width="3188" height="1202" alt="frame (3)" src="Gameend.png" />
 *Add caption explaining what this shows*
 
 # Diagrams
