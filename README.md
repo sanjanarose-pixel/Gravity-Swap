@@ -58,52 +58,32 @@ For Software:
 
 # Screenshots (Add at least 3)
 <img width="3188" height="1202" alt="frame (3)" src="Intropage.png" />
-*Add caption explaining what this shows*
+This screenshot is showing the Intro page.
+
 
 <img width="3188" height="1202" alt="frame (3)" src="Loadingpage.png" />
-*Add caption explaining what this shows*
+This screenshot is showing the loading page.
+
 
 <img width="3188" height="1202" alt="frame (3)" src="Gameplay.png" />
-*Add caption explaining what this shows*
+This screenshot is showing the game mechanism.
+
 
 <img width="3188" height="1202" alt="frame (3)" src="Gameend.png" />
-*Add caption explaining what this shows*
+This screenshot is showing the end of the game.
 
-# Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Add caption explaining your workflow*
-
-For Hardware:
-
-# Schematic & Circuit
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
-
-# Build Photos
-![Components](Add photo of your components here)
-*List out all components shown*
-
-![Build](Add photos of build process here)
-*Explain the build steps*
-
-![Final](Add photo of final product here)
-*Explain the final build*
-
+ 
 ### Project Demo
 # Video
 [Add your demo video link here]
 *Explain what the video demonstrates*
 
-# Additional Demos
-[Add any extra demo materials/links]
 
 ## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
+- Sanjana Sujith: They developed the core game mechanics, implemented the physics, and established the rules to ensure smooth and engaging gameplay. Their work laid the foundation for how the game functions and interacts with players.
+
+- Shaen Meryl Saj: They crafted the UI/UX design to create an intuitive and visually appealing interface, while also composing and integrating music and sound effects to enhance the overall player experience. Their contributions brought polish and immersion to the game.
+  
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 
