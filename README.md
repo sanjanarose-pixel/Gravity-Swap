@@ -75,8 +75,8 @@ This screenshot is showing the end of the game.
  
 ### Project Demo
 # Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
+(https://drive.google.com/file/d/1IFnURAd_3h866LQJtrIHDHO4ghENzJAb/view?usp=drivesdk)
+This shows the working of our game
 
 
 ## Team Contributions
