@@ -23,7 +23,7 @@
 </head>
 <body>
 <canvas id="game"></canvas>
-<audio id="bgMusic" src="game.mp3" loop></audio>
+<audio id="bgMusic" src="game.mp3" loop autoplay muted></audio>
 
 <script>
 const canvas = document.getElementById("game");
@@ -55,7 +55,7 @@ const flapPower = 11;
 
 let pipes = [];
 const pipeWidth = 60;
-const gapHeight = 500; // Increased gap height
+const gapHeight = 500;
 const pipeSpeed = 3.2;
 const pipeFrequency = 2000;
 
@@ -99,7 +99,7 @@ function triggerGravityFlipCountdown() {
     countdownScale = 2;
     countdownOpacity = 1;
 
-    // Flip gravity immediately after "1"
+    // Flip gravity right after "1"
     if (sequence[i] === "1") {
       gravityDirection *= -1;
       gravity = 0.4 * gravityDirection;
@@ -277,18 +277,26 @@ function restartGame() {
   countdown = null;
 }
 
-// Background Music
+// Music autoplay fix
 const bgMusic = document.getElementById('bgMusic');
 bgMusic.volume = 0.5;
 
-function playMusic() {
-  bgMusic.play().catch(() => {});
-  window.removeEventListener('click', playMusic);
-  window.removeEventListener('keydown', playMusic);
-}
-window.addEventListener('click', playMusic);
-window.addEventListener('keydown', playMusic);
+window.addEventListener('DOMContentLoaded', () => {
+  bgMusic.muted = false;
+  const playAttempt = bgMusic.play();
+  if (playAttempt !== undefined) {
+    playAttempt.catch(() => {
+      // fallback
+      const resumeMusic = () => {
+        bgMusic.play();
+        window.removeEventListener('click', resumeMusic);
+        window.removeEventListener('keydown', resumeMusic);
+      };
+      window.addEventListener('click', resumeMusic);
+      window.addEventListener('keydown', resumeMusic);
+    });
+  }
+});
 </script>
 </body>
 </html>
-
