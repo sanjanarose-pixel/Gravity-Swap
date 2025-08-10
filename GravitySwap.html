@@ -54,7 +54,7 @@ const flapPower = 10;
 
 let pipes = [];
 const pipeWidth = 60;
-const gapHeight = 425; // Increased gap for easier play
+const gapHeight = 425;
 const pipeSpeed = 3.5;
 const pipeFrequency = 2000;
 
@@ -244,6 +244,19 @@ function draw() {
   ctx.textBaseline = "top";
   ctx.fillText(`SCORE: ${score}`, canvas.width - 20, 20);
 
+  // ✅ Gravity Direction Indicator (Bottom-Right)
+  const indicatorText = gravityDirection === 1 ? "⬇️ GRAVITY" : "⬆️ GRAVITY";
+  ctx.save();
+  ctx.font = "25px 'PressStart2P', monospace";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "bottom";
+  ctx.fillStyle = "#00ffcc";
+  ctx.shadowColor = "#00ffff";
+  ctx.shadowBlur = 20;
+  ctx.fillText(indicatorText, canvas.width - 20, canvas.height - 60); // Positioned above bottom pipe space
+  ctx.shadowBlur = 0;
+  ctx.restore();
+
   // Game Over UI
   if (gameOver) {
     ctx.fillStyle = "#ffffff";
@@ -278,7 +291,7 @@ function restartGame() {
   score = 0;
   gameOver = false;
   gravityDirection = 1;
-  gravity = 0.4;
+  gravity = 0.35;
   countdown = null;
 }
 
