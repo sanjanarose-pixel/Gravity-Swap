@@ -1,302 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Space Flappy - Gravity Flip</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: black;
-      font-family: 'Courier New', Courier, monospace;
-      color: #00ff00;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Space Entrance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
+    background: black;
+    font-family: 'Orbitron', sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+  }
+
+  #sky {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 0;
+    background: black;
+  }
+
+  .star {
+    opacity: 0;
+    position: absolute;
+    background: white;
+    box-shadow: 0 0 20px 0 rgb(255 255 255);
+    border-radius: 50%;
+    transform-origin: 0 0;
+    animation-timing-function: linear !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .size-1 {
+    width: 1px;
+    height: 1px;
+  }
+
+  .size-2 {
+    width: 2px;
+    height: 2px;
+  }
+
+  video#bgVideo {
+    position: fixed;
+    top: 50%; left: 50%;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    filter: brightness(0.3);
+  }
+
+  #logoContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    z-index: 2;
+  }
+
+  #logo {
+    width: 400px;
+    height: 400px;
+    opacity: 0;
+    transform-origin: center center;
+    transform: scale(0);
+    animation: dotToFull 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes dotToFull {
+    0% {
+      opacity: 0;
+      transform: scale(0);
     }
-    canvas {
-      display: block;
+    60% {
+      opacity: 1;
+      transform: scale(0.6);
     }
-    @font-face {
-      font-family: 'PressStart2P';
-      src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8T-267oIAQAu6jDQyKFF2zw.woff2') format('woff2');
+    100% {
+      opacity: 1;
+      transform: scale(1);
     }
-  </style>
+  }
+
+  #startButton {
+    display: none;
+    background: linear-gradient(45deg, #ccc, #eee);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    color: black;
+    cursor: pointer;
+    box-shadow:
+      0 0 10px white,
+      0 0 20px white;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 2;
+    margin-top: 20px;
+  }
+
+  #startButton:hover {
+    transform: scale(1.1);
+  }
+
+  #footer {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    font-size: 12px;
+    color: #ccc;
+    font-family: 'Orbitron', sans-serif;
+    opacity: 0.7;
+    z-index: 3;
+    letter-spacing: 1px;
+    pointer-events: none;
+    user-select: none;
+  }
+</style>
 </head>
 <body>
-<canvas id="game"></canvas>
-<audio id="bgMusic" src="game.mp3" loop autoplay muted></audio>
+
+<div id="sky"></div>
+
+<video id="bgVideo" autoplay muted loop playsinline>
+  <source src="entrance.mp4" type="video/mp4" />
+  Sorry, your browser does not support the video tag.
+</video>
+
+<div id="logoContainer">
+  <img id="logo" src="logo.png" alt="Logo" />
+</div>
+
+<button id="startButton">TAP TO START</button>
+
+<!-- Footer added here -->
+<div id="footer">Project of Sanjana & Shaen · All rights reserved</div>
+
+<audio id="bgAudio" loop preload="auto" src="intro.mp3"></audio>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+  const sky = document.getElementById('sky');
+  let center = {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2
+  };
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+  function createStar(i) {
+    const star = document.createElement('span');
+    star.classList.add('star');
 
-// Game Assets
-const birdImg = new Image();
-birdImg.src = "pixel_bird-removebg-preview.png";
+    const size = Math.random() > 0.5 ? 'size-1' : 'size-2';
+    star.classList.add(size);
 
-const birdWidth = 90;
-const birdHeight = 90;
+    star.style.top = center.y + 'px';
+    star.style.left = center.x + 'px';
 
-let bird = {
-  x: canvas.width / 4,
-  y: canvas.height / 2,
-  vy: 0
-};
+    const angle = i * 4;
+    const duration = Math.floor(Math.random() * 35000) + 10000;
 
-let gravity = 0.4;
-let gravityDirection = 1;
-const flapPower = 11;
-
-let pipes = [];
-const pipeWidth = 60;
-const gapHeight = 500;
-const pipeSpeed = 3.2;
-const pipeFrequency = 2000;
-
-let gameOver = false;
-
-let bg = new Image();
-bg.src = "space.jpg";
-
-let stars = Array.from({ length: 50 }, () => ({
-  x: Math.random() * canvas.width,
-  y: Math.random() * canvas.height,
-  radius: Math.random() * 2
-}));
-
-let score = 0;
-
-// Countdown State
-let countdown = null;
-let countdownScale = 1;
-let countdownOpacity = 1;
-let gravityFlipInterval = 6000;
-
-function triggerGravityFlipCountdown() {
-  if (gameOver) return;
-
-  const sequence = ["3", "2", "1", "GRAVITY SWITCH!"];
-  let i = 0;
-
-  function showNext() {
-    if (gameOver) {
-      countdown = null;
-      return;
-    }
-
-    if (i >= sequence.length) {
-      countdown = null;
-      return;
-    }
-
-    countdown = sequence[i];
-    countdownScale = 2;
-    countdownOpacity = 1;
-
-    // Flip gravity right after "1"
-    if (sequence[i] === "1") {
-      gravityDirection *= -1;
-      gravity = 0.4 * gravityDirection;
-    }
-
-    i++;
-    setTimeout(showNext, 1000);
+    star.style.animation = `moveStar${angle} ${duration}ms linear infinite, fade${(i % 10) + 1} ${duration}ms linear infinite`;
+    return star;
   }
 
-  showNext();
-}
+  function clearStars() {
+    sky.innerHTML = '';
+  }
 
-setInterval(triggerGravityFlipCountdown, gravityFlipInterval);
-
-// Controls
-window.addEventListener("keydown", (e) => {
-  if (!gameOver) {
-    if (gravityDirection === 1 && e.code === "ArrowUp") {
-      bird.vy = -flapPower;
-    } else if (gravityDirection === -1 && e.code === "ArrowDown") {
-      bird.vy = flapPower;
+  function initStars() {
+    clearStars();
+    for(let i = 0; i < 90; i++) {
+      sky.appendChild(createStar(i));
     }
-  } else if (e.code === "Space") {
-    restartGame();
-  }
-});
-
-// Pipes
-function addPipe() {
-  let topHeight = Math.random() * (canvas.height - gapHeight - 150) + 50;
-  pipes.push({
-    x: canvas.width,
-    topHeight: topHeight,
-    scored: false
-  });
-}
-setInterval(() => {
-  if (!gameOver) addPipe();
-}, pipeFrequency);
-
-// Game Update Logic
-function update() {
-  if (gameOver) return;
-
-  bird.vy += gravity;
-  bird.y += bird.vy;
-
-  if (bird.y - birdHeight / 2 < 0 || bird.y + birdHeight / 2 > canvas.height) {
-    endGame();
   }
 
-  for (let i = pipes.length - 1; i >= 0; i--) {
-    let pipe = pipes[i];
-    pipe.x -= pipeSpeed;
+  initStars();
 
-    if (
-      bird.x + birdWidth / 2 > pipe.x &&
-      bird.x - birdWidth / 2 < pipe.x + pipeWidth
-    ) {
-      if (
-        bird.y - birdHeight / 2 < pipe.topHeight ||
-        bird.y + birdHeight / 2 > pipe.topHeight + gapHeight
-      ) {
-        endGame();
+  const styleSheet = document.createElement('style');
+  document.head.appendChild(styleSheet);
+
+  for(let i = 0; i < 360; i += 4) {
+    let rad = (i * Math.PI) / 180;
+    let x = 80 * Math.cos(rad);
+    let y = 80 * Math.sin(rad);
+    styleSheet.sheet.insertRule(`
+      @keyframes moveStar${i} {
+        100% { transform: translate(${x}vw, ${y}vh); }
       }
-    }
-
-    if (!pipe.scored && pipe.x + pipeWidth < bird.x - birdWidth / 2) {
-      score += 25;
-      pipe.scored = true;
-    }
-
-    if (pipe.x + pipeWidth < 0) {
-      pipes.splice(i, 1);
-    }
+    `, styleSheet.sheet.cssRules.length);
   }
 
-  stars.forEach(star => {
-    star.x -= 0.5;
-    if (star.x < 0) {
-      star.x = canvas.width;
-      star.y = Math.random() * canvas.height;
+  for(let i = 1; i <= 10; i++) {
+    const start = Math.floor(Math.random() * 20);
+    const end = start + 10;
+    styleSheet.sheet.insertRule(`
+      @keyframes fade${i} {
+        ${start}% { opacity: 0; }
+        ${end}% { opacity: 1; }
+        100% { opacity: 1; }
+      }
+    `, styleSheet.sheet.cssRules.length);
+  }
+
+  const logo = document.getElementById('logo');
+  const startButton = document.getElementById('startButton');
+  const bgAudio = document.getElementById('bgAudio');
+
+  window.addEventListener('load', () => {
+    bgAudio.muted = false;
+    const playPromise = bgAudio.play();
+
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        bgAudio.muted = true;
+        bgAudio.play();
+      });
     }
   });
 
-  if (countdown !== null) {
-    countdownScale += 0.05;
-    countdownOpacity -= 0.03;
-    if (countdownOpacity < 0) countdownOpacity = 0;
-  }
-}
-
-// Draw Everything
-function draw() {
-  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
-
-  // Stars
-  ctx.fillStyle = "white";
-  stars.forEach(star => {
-    ctx.beginPath();
-    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-    ctx.fill();
+  logo.addEventListener('animationend', () => {
+    startButton.style.display = 'block';
   });
 
-  // Bird
-  ctx.drawImage(birdImg, bird.x - birdWidth / 2, bird.y - birdHeight / 2, birdWidth, birdHeight);
+  setInterval(() => {
+    startButton.style.textShadow = '0 0 20px white, 0 0 40px white';
+    setTimeout(() => {
+      startButton.style.textShadow = '';
+    }, 700);
+  }, 2000);
 
-  // Pipes
-  for (let p of pipes) {
-    let grad = ctx.createLinearGradient(p.x, 0, p.x + pipeWidth, 0);
-    grad.addColorStop(0, "#a74ac7");
-    grad.addColorStop(0.5, "#7d1b7e");
-    grad.addColorStop(1, "#a74ac7");
-    ctx.fillStyle = grad;
-    ctx.shadowColor = "cyan";
-    ctx.shadowBlur = 15;
+  startButton.addEventListener('click', () => {
+    bgAudio.muted = false;
+    bgAudio.play();
+    window.location.href = 'Transition.html';
+  });
 
-    ctx.fillRect(p.x, 0, pipeWidth, p.topHeight);
-    ctx.fillRect(p.x, p.topHeight + gapHeight, pipeWidth, canvas.height - (p.topHeight + gapHeight));
-    ctx.shadowBlur = 0;
-  }
-
-  // Gravity Flip Countdown
-  if (countdown !== null) {
-    ctx.save();
-    ctx.globalAlpha = countdownOpacity;
-    ctx.fillStyle = "yellow";
-    ctx.font = `${80 * countdownScale}px 'PressStart2P', monospace`;
-    ctx.textAlign = "center";
-    ctx.fillText(countdown, canvas.width / 2, canvas.height / 2);
-    ctx.restore();
-  }
-
-  // Score
-  ctx.fillStyle = "#00ff00";
-  ctx.font = "bold 36px 'Courier New', monospace";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "top";
-  ctx.fillText(`SCORE: ${score}`, canvas.width - 20, 20);
-
-  // Game Over UI
-  if (gameOver) {
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "20px 'PressStart2P', monospace";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("GAME OVER - PRESS SPACE TO RESTART", canvas.width / 2, canvas.height / 2 - 30);
-
-    ctx.fillStyle = "#ff5555";
-    ctx.font = "bold 26px 'Courier New', monospace";
-    ctx.fillText(`FINAL SCORE: ${score}`, canvas.width / 2, canvas.height / 2 + 20);
-  }
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-gameLoop();
-
-function endGame() {
-  gameOver = true;
-  countdown = null;
-}
-
-function restartGame() {
-  bird.y = canvas.height / 2;
-  bird.vy = 0;
-  pipes = [];
-  score = 0;
-  gameOver = false;
-  gravityDirection = 1;
-  gravity = 0.4;
-  countdown = null;
-}
-
-// Music autoplay fix
-const bgMusic = document.getElementById('bgMusic');
-bgMusic.volume = 0.5;
-
-window.addEventListener('DOMContentLoaded', () => {
-  bgMusic.muted = false;
-  const playAttempt = bgMusic.play();
-  if (playAttempt !== undefined) {
-    playAttempt.catch(() => {
-      // fallback
-      const resumeMusic = () => {
-        bgMusic.play();
-        window.removeEventListener('click', resumeMusic);
-        window.removeEventListener('keydown', resumeMusic);
-      };
-      window.addEventListener('click', resumeMusic);
-      window.addEventListener('keydown', resumeMusic);
-    });
-  }
-});
+  window.addEventListener('resize', () => {
+    center.x = window.innerWidth / 2;
+    center.y = window.innerHeight / 2;
+  });
 </script>
+
 </body>
 </html>
