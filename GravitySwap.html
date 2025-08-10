@@ -55,7 +55,7 @@ const flapPower = 11;
 
 let pipes = [];
 const pipeWidth = 60;
-const gapHeight = 400;
+const gapHeight = 500; // Increased gap height
 const pipeSpeed = 3.2;
 const pipeFrequency = 2000;
 
@@ -91,8 +91,6 @@ function triggerGravityFlipCountdown() {
     }
 
     if (i >= sequence.length) {
-      gravityDirection *= -1;
-      gravity = 0.4 * gravityDirection;
       countdown = null;
       return;
     }
@@ -100,6 +98,13 @@ function triggerGravityFlipCountdown() {
     countdown = sequence[i];
     countdownScale = 2;
     countdownOpacity = 1;
+
+    // Flip gravity immediately after "1"
+    if (sequence[i] === "1") {
+      gravityDirection *= -1;
+      gravity = 0.4 * gravityDirection;
+    }
+
     i++;
     setTimeout(showNext, 1000);
   }
@@ -273,9 +278,7 @@ function restartGame() {
 }
 
 // Background Music
-const bgMusic = document.createElement('audio');
-bgMusic.src = 'game.mp3';
-bgMusic.loop = true;
+const bgMusic = document.getElementById('bgMusic');
 bgMusic.volume = 0.5;
 
 function playMusic() {
@@ -288,5 +291,3 @@ window.addEventListener('keydown', playMusic);
 </script>
 </body>
 </html>
-
-
