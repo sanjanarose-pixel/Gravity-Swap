@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GravitySwap-The game</title>
+  <title>GravitySwap - The Game</title>
   <style>
     body {
       margin: 0;
@@ -36,10 +36,9 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// Game Assets
+// Assets
 const birdImg = new Image();
 birdImg.src = "pixel_bird-removebg-preview.png";
-
 const birdWidth = 90;
 const birdHeight = 90;
 
@@ -55,7 +54,7 @@ const flapPower = 10;
 
 let pipes = [];
 const pipeWidth = 60;
-const gapHeight = 420;
+const gapHeight = 425; // Increased gap for easier play
 const pipeSpeed = 3.5;
 const pipeFrequency = 2000;
 
@@ -76,6 +75,7 @@ let score = 0;
 let countdown = null;
 let countdownScale = 1;
 let countdownOpacity = 1;
+let countdownPulse = true;
 let gravityFlipInterval = 6000;
 
 function triggerGravityFlipCountdown() {
@@ -96,10 +96,10 @@ function triggerGravityFlipCountdown() {
     }
 
     countdown = sequence[i];
-    countdownScale = 2;
+    countdownScale = 1;
     countdownOpacity = 1;
+    countdownPulse = true;
 
-    // Flip gravity right after "1"
     if (sequence[i] === "1") {
       gravityDirection *= -1;
       gravity = 0.4 * gravityDirection;
@@ -140,7 +140,7 @@ setInterval(() => {
   if (!gameOver) addPipe();
 }, pipeFrequency);
 
-// Game Update Logic
+// Update Logic
 function update() {
   if (gameOver) return;
 
@@ -186,13 +186,14 @@ function update() {
   });
 
   if (countdown !== null) {
-    countdownScale += 0.05;
-    countdownOpacity -= 0.03;
+    countdownScale = countdownPulse ? countdownScale + 0.03 : countdownScale - 0.03;
+    countdownOpacity -= 0.015;
+    if (countdownScale > 1.5 || countdownScale < 1) countdownPulse = !countdownPulse;
     if (countdownOpacity < 0) countdownOpacity = 0;
   }
 }
 
-// Draw Everything
+// Draw
 function draw() {
   ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
@@ -226,10 +227,13 @@ function draw() {
   if (countdown !== null) {
     ctx.save();
     ctx.globalAlpha = countdownOpacity;
-    ctx.fillStyle = "yellow";
-    ctx.font = `${80 * countdownScale}px 'PressStart2P', monospace`;
+    ctx.fillStyle = "lime";
+    ctx.font = `${60 * countdownScale}px 'PressStart2P', monospace`;
     ctx.textAlign = "center";
+    ctx.shadowColor = "#00ffcc";
+    ctx.shadowBlur = 30;
     ctx.fillText(countdown, canvas.width / 2, canvas.height / 2);
+    ctx.shadowBlur = 0;
     ctx.restore();
   }
 
@@ -254,6 +258,7 @@ function draw() {
   }
 }
 
+// Game loop
 function gameLoop() {
   update();
   draw();
@@ -279,14 +284,13 @@ function restartGame() {
 
 // Music autoplay fix
 const bgMusic = document.getElementById('bgMusic');
-bgMusic.volume = 0.5;
+bgMusic.volume = 0.6;
 
 window.addEventListener('DOMContentLoaded', () => {
   bgMusic.muted = false;
   const playAttempt = bgMusic.play();
   if (playAttempt !== undefined) {
     playAttempt.catch(() => {
-      // fallback
       const resumeMusic = () => {
         bgMusic.play();
         window.removeEventListener('click', resumeMusic);
@@ -300,7 +304,3 @@ window.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
-
-
-
